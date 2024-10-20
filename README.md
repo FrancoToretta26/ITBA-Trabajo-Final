@@ -20,22 +20,22 @@ Este proyecto es un pipeline de ETL (Extract, Transform, Load) utilizando Apache
 - **config/**: Contiene archivos de configuración.
   - **.env**: Archivo de configuración con variables de entorno.
 
-## Pre-Requisitos:
+## Pre-Requisitos
 
 - Docker instalado.
 
 ## Instalación
 
-1. Clonar el repositorio: `git clone https://github.com/tu-usuario/ITBA-Trabajo-Final.git`
+1. Clonar el repositorio: `git clone https://github.com/FrancoToretta26/ITBA-Trabajo-Final.git`
 2. Ingresar a la carpeta ITBA-Trabajo-Final: `cd ITBA-Trabajo-Final`
 3. Instala las dependencias: `pip install -r requirements.txt`
 4. En la carpeta root del proyecto, crear la carpeta `config`.
 5. Dentro de la carpeta `config` crear un archivo `.env`
 6. Ingresar las credenciales que fueron enviadas por privado dentro del archivo `.env`.
 7. Ejecutar en la terminal `docker compose up --build`.
-8. Al finalizar la ejecución, ingresar a http://localhost:8080
+8. Al finalizar la ejecución, ingresar a <http://localhost:8080>
 9. Ingresar a Airflow mediante `user: airflow` `password: airflow`
-10. Una vez finalizado la ejecución del DAG, dirigirse al siguiente repositorio y seguir los pasos: https://github.com/FrancoToretta26/currency-reserves-chart
+10. Una vez finalizado la ejecución del DAG, dirigirse al siguiente repositorio y seguir los pasos: <https://github.com/FrancoToretta26/currency-reserves-chart>
 
 ## DAG de Airflow - Proceso ETL para Obtener y Calcular Reservas en Pesos
 
