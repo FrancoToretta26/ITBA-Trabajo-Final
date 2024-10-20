@@ -2,6 +2,17 @@ import pandas as pd
 from .redshift_save import guardar_en_redshift
 
 def calcular_reservas_en_pesos(**kwargs):
+    """
+    Calcula las reservas en pesos a partir de las reservas en dólares y la cotización del dólar blue,
+    y guarda los resultados en Redshift.
+
+    Args:
+        **kwargs: Diccionario de argumentos que incluye 'ti' (Task Instance).
+
+    Raises:
+        KeyError: Si no se encuentran las claves 'df_reservas' o 'df_dolar' en XCom.
+    """
+
     df_reservas = pd.DataFrame(kwargs['ti'].xcom_pull(key='df_reservas'))
     df_dolar = pd.DataFrame(kwargs['ti'].xcom_pull(key='df_dolar'))
 
