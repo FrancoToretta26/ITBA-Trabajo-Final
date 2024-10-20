@@ -11,13 +11,18 @@ class TestRedshiftSave(unittest.TestCase):
         mock_cursor = MagicMock()
         mock_connect.return_value = mock_conn
         mock_conn.cursor.return_value = mock_cursor
-
         df = pd.DataFrame({'col1': ['value1'], 'col2': ['value2']})
-        guardar_en_redshift(df, 'test_table')
 
+        guardar_en_redshift(df, 'test_table')
         mock_connect.assert_called_once()
-        mock_cursor.execute.assert_called()
+        
+        mock_cursor.execute.assert_called_with(
+            '\n        INSERT INTO test_table (col1, col2)\n        VALUES (%s, %s);\n        ',
+            ('value1', 'value2')
+        )
+
         mock_conn.commit.assert_called_once()
+
         mock_cursor.close.assert_called_once()
         mock_conn.close.assert_called_once()
 

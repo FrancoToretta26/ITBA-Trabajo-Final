@@ -1,24 +1,46 @@
 import unittest
-from unittest.mock import MagicMock
+from unittest.mock import patch, MagicMock
 import pandas as pd
+from pandas.testing import assert_frame_equal
 from dags.etl.transformations import calcular_reservas_en_pesos
 
 class TestTransformations(unittest.TestCase):
 
-    def test_calcular_reservas_en_pesos(self):
-        df_reservas = pd.DataFrame({'fecha': ['2024-07-01'], 'reservas_dolares': [100]})
-        df_dolar = pd.DataFrame({'fecha': ['2024-07-01'], 'valor_blue': [150]})
+    @patch('dags.etl.transformations.guardar_en_redshift')
+    def test_calcular_reservas_en_pesos(self, mock_guardar_en_redshift):
+        df_reservas = pd.DataFrame({
+            'fecha': ['2024-07-01'],
+            'valor': [100]
+        })
+        df_dolar = pd.DataFrame({
+            'fecha': ['2024-07-01'],
+            'venta': [150]
+        })
 
-        kwargs = {'ti': MagicMock()}
-        kwargs['ti'].xcom_pull.side_effect = [df_reservas.to_dict(), df_dolar.to_dict()]
+        kwargs = {
+            'ti': MagicMock()
+        }
+        kwargs['ti'].xcom_pull.side_effect = lambda key: df_reservas if key == 'df_reservas' else df_dolar
 
         calcular_reservas_en_pesos(**kwargs)
 
-        df_combined = pd.merge(df_reservas, df_dolar, on='fecha', how="inner", validate="many_to_many")
-        df_combined['reservas_en_pesos'] = df_combined['reservas_dolares'] * df_combined['valor_blue']
+        self.assertTrue(mock_guardar_en_redshift.called)
 
-        expected_output = df_combined[['fecha', 'reservas_dolares', 'valor_blue', 'reservas_en_pesos']]
-        print(expected_output)
+
+        args, _ = mock_guardar_en_redshift.call_args
+
+        # DataFrame esperado
+        expected_df = pd.DataFrame({
+            'fecha': ['2024-07-01'],
+            'reservas_dolares': [100],
+            'valor_blue': [150],
+            'reservas_en_pesos': [15000]
+        })
+
+
+        assert_frame_equal(args[0], expected_df)
+
+        self.assertEqual(args[1], "reservas_en_pesos")
 
 if __name__ == '__main__':
     unittest.main()
