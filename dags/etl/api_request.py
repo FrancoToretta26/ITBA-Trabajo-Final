@@ -15,6 +15,17 @@ idVariable = 1
 casa = "blue"
 
 def obtener_reservas(**kwargs):
+    """
+    Obtiene las reservas desde una API y guarda los datos en Redshift.
+
+    Args:
+        **kwargs: Diccionario de argumentos que incluye 'execution_date' y 'ti' (Task Instance).
+
+    Raises:
+        ValueError: Si no se encuentran resultados en la respuesta de la API de reservas.
+        Exception: Si ocurre una excepción durante la solicitud a la API de reservas.
+    """
+        
     execution_date = kwargs['execution_date']
     desde = execution_date.strftime("%Y-%m-%d")
     hasta = execution_date.strftime("%Y-%m-%d")
@@ -36,6 +47,15 @@ def obtener_reservas(**kwargs):
         raise Exception(f"Excepción durante la solicitud a la API de reservas: {e}")
 
 def obtener_dolar(**kwargs):
+    """
+    Obtiene la cotización del dólar desde una API y guarda los datos en Redshift.
+
+    Args:
+        **kwargs: Diccionario de argumentos que incluye 'execution_date' y 'ti' (Task Instance).
+
+    Raises:
+        Exception: Si ocurre una excepción durante la solicitud a la API de dólar.
+    """
     execution_date = kwargs['execution_date']
     
     fecha = execution_date.strftime("%Y/%m/%d")
