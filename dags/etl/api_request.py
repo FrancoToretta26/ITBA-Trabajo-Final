@@ -2,6 +2,7 @@ import requests
 import pandas as pd
 import os
 from dotenv import load_dotenv
+from .redshift_save import guardar_en_redshift
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '../..', 'config', '.env')
 if os.path.exists(dotenv_path):
@@ -26,7 +27,6 @@ def obtener_reservas(**kwargs):
             if 'results' in data_reservas:
                 df_reservas = pd.DataFrame(data_reservas['results'])
                 kwargs['ti'].xcom_push(key='df_reservas', value=df_reservas.to_dict())
-                from .redshift_save import guardar_en_redshift
                 guardar_en_redshift(df_reservas, "reservas")
             else:
                 raise ValueError("No se encontraron resultados en la respuesta de la API de reservas.")
@@ -51,7 +51,6 @@ def obtener_dolar(**kwargs):
             print(f"Error en la solicitud del dólar para {fecha}: {response.status_code}")
         df_dolar = pd.DataFrame(datos_dolar)
         kwargs['ti'].xcom_push(key='df_dolar', value=df_dolar.to_dict())
-        from .redshift_save import guardar_en_redshift
         guardar_en_redshift(df_dolar, "dolar")
     except Exception as e:
         raise Exception(f"Excepción durante la solicitud a la API de dólar: {e}")
