@@ -16,7 +16,7 @@ casa = "blue"
 
 def obtener_reservas(**kwargs):
     """
-    Obtiene las reservas desde una API y guarda los datos en Redshift.
+    Obtiene las reservas desde una API y guarda los datos en un archivo CSV.
 
     Args:
         **kwargs: Diccionario de argumentos que incluye 'execution_date' y 'ti' (Task Instance).
@@ -25,7 +25,6 @@ def obtener_reservas(**kwargs):
         ValueError: Si no se encuentran resultados en la respuesta de la API de reservas.
         Exception: Si ocurre una excepción durante la solicitud a la API de reservas.
     """
-        
     execution_date = kwargs['execution_date']
     desde = execution_date.strftime("%Y-%m-%d")
     hasta = execution_date.strftime("%Y-%m-%d")
@@ -37,8 +36,10 @@ def obtener_reservas(**kwargs):
             data_reservas = response.json()
             if 'results' in data_reservas:
                 df_reservas = pd.DataFrame(data_reservas['results'])
-                kwargs['ti'].xcom_push(key='df_reservas', value=df_reservas.to_dict())
-                guardar_en_redshift(df_reservas, "reservas")
+                file_path = f"/tmp/reservas_{desde}_{hasta}.csv"
+                os.makedirs(os.path.dirname(file_path), exist_ok=True)
+                df_reservas.to_csv(file_path, index=False)
+                kwargs['ti'].xcom_push(key='reservas_file_path', value=file_path)
             else:
                 raise ValueError("No se encontraron resultados en la respuesta de la API de reservas.")
         else:
@@ -48,7 +49,7 @@ def obtener_reservas(**kwargs):
 
 def obtener_dolar(**kwargs):
     """
-    Obtiene la cotización del dólar desde una API y guarda los datos en Redshift.
+    Obtiene la cotización del dólar desde una API y guarda los datos en un archivo CSV.
 
     Args:
         **kwargs: Diccionario de argumentos que incluye 'execution_date' y 'ti' (Task Instance).
@@ -70,7 +71,9 @@ def obtener_dolar(**kwargs):
         else:
             print(f"Error en la solicitud del dólar para {fecha}: {response.status_code}")
         df_dolar = pd.DataFrame(datos_dolar)
-        kwargs['ti'].xcom_push(key='df_dolar', value=df_dolar.to_dict())
-        guardar_en_redshift(df_dolar, "dolar")
+        file_path = f"/tmp/dolar_{fecha}.csv"
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        df_dolar.to_csv(file_path, index=False)
+        kwargs['ti'].xcom_push(key='dolar_file_path', value=file_path)
     except Exception as e:
         raise Exception(f"Excepción durante la solicitud a la API de dólar: {e}")
