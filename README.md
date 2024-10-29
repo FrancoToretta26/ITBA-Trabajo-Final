@@ -57,11 +57,13 @@ Cada tarea está enlazada secuencialmente, garantizando que se ejecuten de maner
 
 ## Gráfico realizado en Next.Js
 
+**ACTUALIZACIÓN**: Se modificó el estilo del gráfico y se agregaron filtros de días y las reservas totales.
+
 **Histórico de reservas en Dólares.**
-![alt text](image-2.png)
+![alt text](image-4.png)
 
 **Histórico de reservas en Pesos.**
-![alt text](image-3.png)
+![alt text](image-5.png)
 
 ## Testing unitario
 
