@@ -17,6 +17,16 @@ redshift_schema = os.getenv("REDSHIFT_SCHEMA")
 redshift_port = int(redshift_port)
 
 def guardar_en_redshift(df: pd.DataFrame, table_name: str):
+    """
+    Guarda un DataFrame en una tabla de Redshift, asegurando que la operación sea idempotente (eliminando las fechas que ya existan).
+
+    Args:
+        df (pd.DataFrame): DataFrame a guardar en Redshift.
+        table_name (str): Nombre de la tabla en Redshift.
+
+    Raises:
+        psycopg2.Error: Si ocurre un error al interactuar con la base de datos.
+    """
     conn = psycopg2.connect(
         host=redshift_host,
         port=redshift_port,
@@ -34,6 +44,11 @@ def guardar_en_redshift(df: pd.DataFrame, table_name: str):
     );
     """
     cursor.execute(create_table_query)
+    
+    fechas = df['fecha'].unique()
+    fechas_str = ', '.join([f"'{fecha}'" for fecha in fechas])
+    delete_query = f"DELETE FROM {table_name} WHERE fecha IN ({fechas_str});"
+    cursor.execute(delete_query)
     
     for _, row in df.iterrows():
         insert_query = f"""
